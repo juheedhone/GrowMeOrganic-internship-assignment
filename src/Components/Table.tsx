@@ -36,7 +36,13 @@ const Table = () => {
 
   return (
     <div className="card">
-      <DataTable value={response?.data} tableStyle={{ minWidth: "50rem" }}>
+      <DataTable
+        value={response?.data}
+        paginator
+        rows={5}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        tableStyle={{ minWidth: "50rem" }}
+      >
         <Column field="title" header="Title"></Column>
         <Column field="place_of_origin" header="Place_of_origin"></Column>
         <Column field="artist_display" header="Artist_display"></Column>
