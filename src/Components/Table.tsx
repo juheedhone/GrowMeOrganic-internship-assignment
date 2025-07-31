@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Column } from "primereact/column";
 
-import { DataTable } from "primereact/datatable";
+import { DataTable, type DataTableStateEvent } from "primereact/datatable";
 import { Skeleton } from "primereact/skeleton";
 import { useEffect, useState } from "react";
 
@@ -32,17 +32,24 @@ const Table = () => {
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
 
+  const onPageChange = (event: DataTableStateEvent) => {
+    const newPage = (event.page || 0) + 1;
+    if (page !== newPage) {
+      setPage(newPage);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     axios
-      .get("https://api.artic.edu/api/v1/artworks?page=1")
+      .get(`https://api.artic.edu/api/v1/artworks?page=${page}`)
       .then((data) => setResponse(data.data))
       .catch((error) => {
         console.log(error);
         setError(true);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [page]);
 
   return (
     <>
@@ -56,6 +63,9 @@ const Table = () => {
           paginator
           rows={12}
           tableStyle={{ minWidth: "50rem" }}
+          totalRecords={120}
+          lazy={true}
+          onPage={onPageChange}
         >
           <Column field="title" header="Title"></Column>
           <Column field="place_of_origin" header="Place_of_origin"></Column>
