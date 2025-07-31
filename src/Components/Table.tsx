@@ -6,6 +6,7 @@ import { Skeleton } from "primereact/skeleton";
 import { useEffect, useState } from "react";
 
 interface IData {
+  id: number;
   title: string;
   place_of_origin: string;
   artist_display: string;
@@ -31,6 +32,7 @@ const Table = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<IData[]>([]);
 
   const onPageChange = (event: DataTableStateEvent) => {
     const newPage = (event.page || 0) + 1;
@@ -66,8 +68,20 @@ const Table = () => {
           totalRecords={120}
           lazy={true}
           onPage={onPageChange}
+          selection={selectedProducts}
+          onSelectionChange={(e) => setSelectedProducts(e.value)}
+          selectionMode="multiple"
+          dataKey="id"
         >
-          <Column field="title" header="Title"></Column>
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "3rem" }}
+          ></Column>
+          <Column
+            style={{ padding: 0 }}
+            header={<i className="pi pi-angle-down"></i>}
+          ></Column>
+          <Column field="title" header={"Title"}></Column>
           <Column field="place_of_origin" header="Place_of_origin"></Column>
           <Column field="artist_display" header="Artist_display"></Column>
           <Column field="inscriptions" header="Inscriptions"></Column>

@@ -17,3 +17,9 @@ body {
 .error-text {
   color: red;
 }
+
+.select-panel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
