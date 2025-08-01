@@ -7,14 +7,20 @@ import {
 } from "primereact/inputnumber";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Skeleton } from "primereact/skeleton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useData from "../hooks/useData";
 import type { IData } from "../models/data";
 
 const Table = () => {
   const { response, loading, error, setPage, page } = useData();
 
-  const [selectedProducts, setSelectedProducts] = useState<IData[]>([]);
+  const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<
+    {
+      page: number;
+      rows: number;
+    }[]
+  >([]);
+  const [selectedRows, setSelectedRows] = useState<IData[]>([]);
   const [rowInput, setRowInput] = useState<number | null>();
   const op = useRef<OverlayPanel | null>(null);
 
@@ -24,6 +30,46 @@ const Table = () => {
       setPage(newPage);
     }
   };
+
+  const handleRowSelectionSubmit = () => {
+    if (!rowInput) return;
+
+    if (rowInput <= 12) {
+      setSelectedRows(response?.data.slice(0, rowInput) || []);
+      setSelectedRowsPerPage([{ page, rows: rowInput }]);
+      return;
+    }
+
+    const newSelectedRowsPerPage = [];
+    let remainingRows = rowInput;
+    const extraPages = Math.ceil(rowInput / 12);
+
+    for (let i = 1; i <= extraPages; i++) {
+      const rowsToSelect = Math.min(12, remainingRows);
+      newSelectedRowsPerPage.push({ page: i, rows: rowsToSelect });
+      remainingRows -= rowsToSelect;
+    }
+
+    setSelectedRowsPerPage(newSelectedRowsPerPage);
+    op.current?.hide();
+  };
+
+  // effect to handle row selection based on selectedRowsPerPage
+  useEffect(() => {
+    const currentPageData = response?.data || [];
+    const currentPageSelectionExists = selectedRowsPerPage.find(
+      (item) => item.page === page
+    );
+
+    if (currentPageSelectionExists) {
+      const allSelectedRows = currentPageData.slice(
+        0,
+        currentPageSelectionExists.rows
+      );
+
+      setSelectedRows(allSelectedRows);
+    }
+  }, [selectedRowsPerPage, response?.data, page]);
 
   return (
     <>
@@ -40,8 +86,8 @@ const Table = () => {
           totalRecords={120}
           lazy={true}
           onPage={onPageChange}
-          selection={selectedProducts}
-          onSelectionChange={(e) => setSelectedProducts(e.value)}
+          selection={selectedRows}
+          onSelectionChange={(e) => setSelectedRows(e.value)}
           selectionMode="multiple"
           dataKey="id"
         >
@@ -60,7 +106,12 @@ const Table = () => {
                   icon="pi pi-angle-down"
                   onClick={(e) => op.current?.toggle(e)}
                 ></Button>
-                <OverlayPanel ref={op} className="row-input-overlay">
+                <OverlayPanel
+                  ref={op}
+                  className="row-input-overlay"
+                  closeOnEscape
+                  showCloseIcon
+                >
                   <InputNumber
                     className="block"
                     placeholder="selected rows.."
@@ -70,7 +121,12 @@ const Table = () => {
                     }
                   />
 
-                  <Button className="block button-block">Submit</Button>
+                  <Button
+                    className="block button-block"
+                    onClick={handleRowSelectionSubmit}
+                  >
+                    Submit
+                  </Button>
                 </OverlayPanel>
               </>
             }
