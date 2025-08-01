@@ -17,7 +17,7 @@ const Table = () => {
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<
     {
       page: number;
-      rows: number;
+      rows: number[];
     }[]
   >([]);
   const [selectedRows, setSelectedRows] = useState<IData[]>([]);
@@ -35,10 +35,11 @@ const Table = () => {
     if (!rowInput) return;
 
     if (rowInput <= 12) {
+      const rowIndices = Array.from({ length: rowInput }, (_, i) => i);
       setSelectedRows(response?.data.slice(0, rowInput) || []);
       setSelectedRowsPerPage([
         ...selectedRowsPerPage,
-        { page, rows: rowInput },
+        { page, rows: rowIndices },
       ]);
       op.current?.hide();
       return;
@@ -50,7 +51,11 @@ const Table = () => {
 
     for (let i = 1; i <= extraPages; i++) {
       const rowsToSelect = Math.min(12, remainingRows);
-      newSelectedRowsPerPage.push({ page: i, rows: rowsToSelect });
+      const rowIndices = Array.from(
+        { length: rowsToSelect },
+        (_, index) => index
+      );
+      newSelectedRowsPerPage.push({ page: i, rows: rowIndices });
       remainingRows -= rowsToSelect;
     }
 
@@ -59,6 +64,7 @@ const Table = () => {
   };
 
   // effect to handle row selection based on selectedRowsPerPage
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <page is not needed bsc changing page changes response.data & we are including response.data in deps>
   useEffect(() => {
     const currentPageData = response?.data || [];
     const currentPageSelectionExists = selectedRowsPerPage.find(
@@ -66,14 +72,13 @@ const Table = () => {
     );
 
     if (currentPageSelectionExists) {
-      const allSelectedRows = currentPageData.slice(
-        0,
-        currentPageSelectionExists.rows
+      const allSelectedRows = currentPageSelectionExists.rows.map(
+        (index) => currentPageData[index]
       );
 
       setSelectedRows(allSelectedRows);
     }
-  }, [selectedRowsPerPage, response?.data, page]);
+  }, [selectedRowsPerPage, response?.data]);
 
   return (
     <>
@@ -99,15 +104,31 @@ const Table = () => {
             const allRowsSelected = e.value.length === currentPageData.length;
 
             if (allRowsSelected && currentPageData.length > 0) {
+              const allRowIndices = Array.from({ length: 12 }, (_, i) => i);
               const updatedSelection = selectedRowsPerPage.filter(
                 (item) => item.page !== page
               );
-              updatedSelection.push({ page, rows: 12 });
+              updatedSelection.push({ page, rows: allRowIndices });
               setSelectedRowsPerPage(updatedSelection);
             } else if (e.value.length === 0) {
               const updatedSelection = selectedRowsPerPage.filter(
                 (item) => item.page !== page
               );
+              setSelectedRowsPerPage(updatedSelection);
+            } else {
+              // partial selection
+              const selectedIndices = e.value
+                .map((selectedRow) =>
+                  currentPageData.findIndex((row) => row.id === selectedRow.id)
+                )
+                .filter((index) => index !== -1);
+
+              const updatedSelection = selectedRowsPerPage.filter(
+                (item) => item.page !== page
+              );
+              if (selectedIndices.length > 0) {
+                updatedSelection.push({ page, rows: selectedIndices });
+              }
               setSelectedRowsPerPage(updatedSelection);
             }
           }}
