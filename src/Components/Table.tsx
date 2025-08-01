@@ -132,12 +132,12 @@ const Table = () => {
               </>
             }
           ></Column>
-          <Column field="title" header={"Title"}></Column>
-          <Column field="place_of_origin" header="Place_of_origin"></Column>
-          <Column field="artist_display" header="Artist_display"></Column>
+          <Column field="title" header="Title"></Column>
+          <Column field="place_of_origin" header="Place of origin"></Column>
+          <Column field="artist_display" header="Artist display"></Column>
           <Column field="inscriptions" header="Inscriptions"></Column>
-          <Column field="date_start" header="Date_start"></Column>
-          <Column field="date_end" header="Date_end"></Column>
+          <Column field="date_start" header="Date start"></Column>
+          <Column field="date_end" header="Date end"></Column>
         </DataTable>
       )}
     </>
