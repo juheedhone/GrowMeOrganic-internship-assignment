@@ -100,6 +100,7 @@ const Table = () => {
                 <OverlayPanel ref={op} className="row-input-overlay">
                   <InputNumber
                     className="block"
+                    placeholder="selected rows.."
                     value={rowInput}
                     onValueChange={(e: InputNumberValueChangeEvent) =>
                       setRowInput(e.value)
