@@ -90,6 +90,7 @@ const Table = () => {
           totalRecords={120}
           lazy={true}
           onPage={onPageChange}
+          first={(page - 1) * 12}
           selection={selectedRows}
           onSelectionChange={(e) => {
             setSelectedRows(e.value);
