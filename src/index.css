@@ -27,9 +27,17 @@ body {
 .button-block {
   margin-top: 1rem;
   margin-left: auto;
- 
 }
 
 .block {
   display: block;
+}
+
+.chevron-button {
+  padding: 0.125rem;
+}
+
+.chevron-button:focus {
+  border: none;
+  box-shadow: none;
 }

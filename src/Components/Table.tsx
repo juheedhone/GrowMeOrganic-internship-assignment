@@ -123,12 +123,13 @@ const Table = () => {
             header={
               <>
                 <Button
+                  className="chevron-button"
                   type="button"
                   text
                   rounded
                   icon="pi pi-angle-down"
                   onClick={(e) => op.current?.toggle(e)}
-                ></Button>
+                />
                 <OverlayPanel
                   ref={op}
                   className="row-input-overlay"
