@@ -36,7 +36,10 @@ const Table = () => {
 
     if (rowInput <= 12) {
       setSelectedRows(response?.data.slice(0, rowInput) || []);
-      setSelectedRowsPerPage([{ page, rows: rowInput }]);
+      setSelectedRowsPerPage([
+        ...selectedRowsPerPage,
+        { page, rows: rowInput },
+      ]);
       op.current?.hide();
       return;
     }
@@ -51,7 +54,7 @@ const Table = () => {
       remainingRows -= rowsToSelect;
     }
 
-    setSelectedRowsPerPage(newSelectedRowsPerPage);
+    setSelectedRowsPerPage([...selectedRowsPerPage, ...newSelectedRowsPerPage]);
     op.current?.hide();
   };
 
@@ -88,7 +91,25 @@ const Table = () => {
           lazy={true}
           onPage={onPageChange}
           selection={selectedRows}
-          onSelectionChange={(e) => setSelectedRows(e.value)}
+          onSelectionChange={(e) => {
+            setSelectedRows(e.value);
+
+            const currentPageData = response?.data || [];
+            const allRowsSelected = e.value.length === currentPageData.length;
+
+            if (allRowsSelected && currentPageData.length > 0) {
+              const updatedSelection = selectedRowsPerPage.filter(
+                (item) => item.page !== page
+              );
+              updatedSelection.push({ page, rows: 12 });
+              setSelectedRowsPerPage(updatedSelection);
+            } else if (e.value.length === 0) {
+              const updatedSelection = selectedRowsPerPage.filter(
+                (item) => item.page !== page
+              );
+              setSelectedRowsPerPage(updatedSelection);
+            }
+          }}
           selectionMode="multiple"
           dataKey="id"
         >
@@ -111,7 +132,6 @@ const Table = () => {
                   ref={op}
                   className="row-input-overlay"
                   closeOnEscape
-                  showCloseIcon
                 >
                   <InputNumber
                     className="block"
