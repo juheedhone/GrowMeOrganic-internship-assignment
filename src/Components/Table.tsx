@@ -37,6 +37,7 @@ const Table = () => {
     if (rowInput <= 12) {
       setSelectedRows(response?.data.slice(0, rowInput) || []);
       setSelectedRowsPerPage([{ page, rows: rowInput }]);
+      op.current?.hide();
       return;
     }
 
