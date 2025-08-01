@@ -23,3 +23,13 @@ body {
   align-items: center;
   gap: 1rem;
 }
+
+.button-block {
+  margin-top: 1rem;
+  margin-left: auto;
+ 
+}
+
+.block {
+  display: block;
+}
