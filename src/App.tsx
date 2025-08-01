@@ -1,4 +1,4 @@
-import DataTable from "./Components/Table";
+import DataTable from "./components/Table";
 
 const App = () => {
   return <DataTable />;

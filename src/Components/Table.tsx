@@ -1,7 +1,5 @@
-import axios from "axios";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-
 import { DataTable, type DataTableStateEvent } from "primereact/datatable";
 import {
   InputNumber,
@@ -9,38 +7,15 @@ import {
 } from "primereact/inputnumber";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Skeleton } from "primereact/skeleton";
-import { useEffect, useRef, useState } from "react";
-
-interface IData {
-  id: number;
-  title: string;
-  place_of_origin: string;
-  artist_display: string;
-  inscriptions: null;
-  date_start: number;
-  date_end: number;
-}
-
-interface IResponse {
-  data: IData[];
-  pagination: {
-    current_page: number;
-    limit: number;
-    next_url: string;
-    offset: number;
-    total: number;
-    total_pages: number;
-  };
-}
+import { useRef, useState } from "react";
+import useData from "../hooks/useData";
+import type { IData } from "../models/data";
 
 const Table = () => {
-  const [response, setResponse] = useState<IResponse>();
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState(false);
+  const { response, loading, error, setPage, page } = useData();
+
   const [selectedProducts, setSelectedProducts] = useState<IData[]>([]);
   const [rowInput, setRowInput] = useState<number | null>();
-  console.log(rowInput);
   const op = useRef<OverlayPanel | null>(null);
 
   const onPageChange = (event: DataTableStateEvent) => {
@@ -49,18 +24,6 @@ const Table = () => {
       setPage(newPage);
     }
   };
-
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`https://api.artic.edu/api/v1/artworks?page=${page}`)
-      .then((data) => setResponse(data.data))
-      .catch((error) => {
-        console.log(error);
-        setError(true);
-      })
-      .finally(() => setLoading(false));
-  }, [page]);
 
   return (
     <>
